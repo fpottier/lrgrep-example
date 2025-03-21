@@ -1,6 +1,6 @@
 {
   open Parser
-  exception Error of Lexing.position * string
+  exception Error of (string * Lexing.position * Lexing.position)
 }
 
 rule token = parse
@@ -25,6 +25,7 @@ rule token = parse
 | ')'
     { RPAREN }
 | _ as c
-    { let position = Lexing.lexeme_start_p lexbuf in
-      let message = Printf.sprintf "Unexpected character: '%c'" c in
-      raise (Error (position, message)) }
+    { let startp = Lexing.lexeme_start_p lexbuf
+      and endp = Lexing.lexeme_end_p lexbuf in
+      let message = Printf.sprintf "Lexical error: unexpected character: '%c'." c in
+      raise (Error (message, startp, endp)) }
