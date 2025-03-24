@@ -10,4 +10,4 @@ test:
 	@ dune exec ./main.exe < test.txt
 
 coverage: all
-	@ lrgrep -coverage errors.mlyl -g _build/default/src/parser.cmly
+	@ lrgrep -coverage src/errors.mlyl -g _build/default/src/parser.cmly
