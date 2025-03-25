@@ -7,7 +7,7 @@ clean:
 	@ git clean -fdX
 
 test:
-	@ dune exec src/main.exe test.txt
+	@ dune build @test
 
 coverage: all
 	@ lrgrep -coverage src/errors.mlyl -g _build/default/src/parser.cmly
