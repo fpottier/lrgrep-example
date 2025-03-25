@@ -7,20 +7,25 @@ type 'a checkpoint = 'a I.checkpoint
 
 (* -------------------------------------------------------------------------- *)
 
-(* [print_syntax_error triple env] constructs and prints a syntax error
-   message. The message is constructed according to the rules in the file
-   [errors.mlyl].
+(* [print_syntax_error content triple env] constructs and prints a syntax
+   error message. The message is constructed according to the rules in the
+   file [errors.mlyl].
 
-   [env] should be the environment carried by the last event (checkpoint) of
-   the form [InputNeeded env]. [triple] should be the triple that was fed to
-   the parser in response to this event; therefore, it should also be the last
-   triple that was obtained from the lexer. *)
+   [content] is the content of the file that we are currently reading.
 
-let print_syntax_error (triple : triple) (env : _ env) =
+   [env] is the environment carried by the last event (checkpoint) of the form
+   [InputNeeded env].
+
+   [triple] is the triple that was fed to the parser in response to this
+   event; therefore, it should also be the last triple that was obtained from
+   the lexer. *)
+
+let print_syntax_error (content : string) (triple : triple) (env : _ env) =
+  Errors.content := Some content; (* TODO *)
   match Errors.error_message env dummy_pos triple with
   | Some msg ->
       (* This syntax error has an explanation. Print it. *)
-      eprintf "%s\n%!" msg
+      eprintf "Syntax error.\n%s\n%!" msg
   | None ->
       (* This syntax error has no explanation. This should never happen
          if [lrgrep] has reported that we have complete coverage of the
@@ -73,17 +78,21 @@ let succeed (v : unit) =
   ignore v;
   printf "Success.\n%!"
 
-(* [fail last checkpoint _] is invoked when the parser fails. The [last]
-   function allows us to retrieve the last token that was read. [checkpoint]
-   is the last checkpoint of the form [InputNeeded _]; any reductions that
-   took place after this point in time are discarded. *)
+(* [fail content last checkpoint _] is invoked when the parser fails.
 
-let fail (last : unit -> triple) (checkpoint : _ checkpoint) (_) =
+   [content] is the content of the file that we are currently reading.
+
+   The function [last] allows us to retrieve the last token that was read.
+
+   [checkpoint] is the last checkpoint of the form [InputNeeded _]; any
+   reductions that took place after this point in time are discarded. *)
+
+let fail content (last : unit -> triple) (checkpoint : _ checkpoint) (_) =
   match checkpoint with
   | InputNeeded env ->
       let triple = last() in
       print_positions triple; (* TODO make sure positions are correct *)
-      print_syntax_error triple env;
+      print_syntax_error content triple env;
       exit 1
   | _ ->
       assert false
@@ -95,18 +104,16 @@ let fail (last : unit -> triple) (checkpoint : _ checkpoint) (_) =
 let process (filename : string) =
   (* Read the file's entire content and create a lexing buffer. *)
   let content, lexbuf = MenhirLib.LexerUtil.read filename in
-  ignore content; (* TODO *)
   (* Create an initial checkpoint for the parser. *)
   let start = Parser.Incremental.main (lexeme_start_p lexbuf) in
   (* Package our lexer and lexing buffer as a [next] function. *)
   let (next : unit -> triple) = I.lexer_lexbuf_to_supplier Lexer.token lexbuf in
   (* Remember the last token that was produced. *)
   let (next : unit -> triple), (last : unit -> triple) = remember next in
-  (* Invoke the parser with success and failure functions [succeed]
-     and [fail last], lexer function [next], and initial checkpoint
-     [start]. *)
+  (* Invoke the parser with success and failure functions [succeed] and
+     [fail], lexer function [next], and initial checkpoint [start]. *)
   try
-    I.loop_handle_undo succeed (fail last) next start
+    I.loop_handle_undo succeed (fail content last) next start
   with
   | Lexer.Error ((message, _, _) as triple) ->
       print_positions triple;

@@ -13,6 +13,22 @@
       line char1 char2
       (* use [char1 + 1] and [char2 + 1] if *not* using Caml mode *)
 
+  (* This global reference gives us access to the content of the current
+     file. Using global mutable state is not very elegant. An alternative
+     would be to parameterize every semantic action (below) with [content].
+     TODO do this, once lrgrep supports it *)
+
+  let content =
+    ref None
+
+  open MenhirLib.ErrorReports
+
+  let slice (w : position * position) =
+    extract (Option.get !content) w
+    |> sanitize
+    |> compress
+    |> shorten 32
+
 }
 
 rule error_message = parse error (main)
@@ -23,4 +39,6 @@ rule error_message = parse error (main)
       sprintf "Expecting a closing parenthesis (opened at %s)" (range' w) }
 | w = [expr / _* . EOF]
     { let w = $startloc(w), $endloc(w) in
-      sprintf "I have read a complete expression (%s)" (range' w) }
+      sprintf "An expression has been recognized (%s):\n  %s\n"
+        (range' w) (slice w) ^
+      sprintf "If this expression is complete, the end of the file is now expected."}
