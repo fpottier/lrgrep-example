@@ -6,6 +6,9 @@ all:
 clean:
 	@ git clean -fdX
 
+# To create or update the expected-output files test/{good,bad}/*.exp,
+# use [dune promote].
+
 test:
 	@ dune build @test
 
