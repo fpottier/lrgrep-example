@@ -52,13 +52,12 @@
 
 rule error_message = parse error (main)
 
-| o=PLUS / _* . expr _*
-| o=MINUS / _* . expr _*
-| o=DIV / _* . expr _*
-| o=TIMES / _* . expr _*
-    (* This binary operator must be preceded by an expression, which we could
-       show; we choose not to do so, and show just the binary operator. *)
+| e=expr; o=PLUS / _* . expr _*
+| e=expr; o=MINUS / _* . expr _*
+| e=expr; o=DIV / _* . expr _*
+| e=expr; o=TIMES / _* . expr _*
     {
+      expr ($startloc(e), $endloc(e)) ^
       binop ($startloc(o), $endloc(o)) ^
       "An expression is now expected."
     }
