@@ -52,10 +52,10 @@
 
 rule error_message = parse error (main)
 
-| o = PLUS / _* . expr _*
-| o = MINUS / _* . expr _*
-| o = DIV / _* . expr _*
-| o = TIMES / _* . expr _*
+| o=PLUS / _* . expr _*
+| o=MINUS / _* . expr _*
+| o=DIV / _* . expr _*
+| o=TIMES / _* . expr _*
     (* This binary operator must be preceded by an expression, which we could
        show; we choose not to do so, and show just the binary operator. *)
     {
@@ -63,20 +63,20 @@ rule error_message = parse error (main)
       "An expression is now expected."
     }
 
-| l = LPAREN / _* . expr _*
+| l=LPAREN / _* . expr _*
     {
       lparen ($startloc(l), $endloc(l)) ^
       "An expression is now expected."
     }
 
-| l = LPAREN; e = [expr / _* . RPAREN]
+| l=LPAREN; e=[expr / _* . RPAREN]
     {
       lparen ($startloc(l), $endloc(l)) ^
       expr ($startloc(e), $endloc(e)) ^
       "If this expression is complete, a closing parenthesis is now expected."
     }
 
-| e = [expr / _* . EOF]
+| e=[expr / _* . EOF]
     {
       expr ($startloc(e), $endloc(e)) ^
       "If this expression is complete, the end of the file is now expected."
