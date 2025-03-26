@@ -8,6 +8,8 @@
 %token PLUS MINUS TIMES DIV
 (* Parentheses. *)
 %token LPAREN RPAREN
+(* Punctuation. *)
+%token COMMA
 (* End of file. *)
 %token EOF
 
@@ -46,4 +48,5 @@ expr:
 | expr TIMES expr
 | expr DIV expr
 | MINUS expr %prec UMINUS
+| LPAREN expr COMMA expr RPAREN
     {}

@@ -12,6 +12,8 @@ rule token = parse
     { EOF }
 | ['0'-'9']+ as i
     { INT (int_of_string i) }
+| ','
+    { COMMA }
 | '+'
     { PLUS }
 | '-'

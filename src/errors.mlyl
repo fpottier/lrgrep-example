@@ -48,6 +48,9 @@
   let binop w =
     read "A binary operator" w
 
+  let comma w =
+    read "A comma" w
+
 }
 
 rule error_message = parse error (main)
@@ -72,7 +75,24 @@ rule error_message = parse error (main)
     {
       lparen ($startloc(l), $endloc(l)) ^
       expr ($startloc(e), $endloc(e)) ^
-      "If this expression is complete, a closing parenthesis is now expected."
+      "If this expression is complete,\na closing parenthesis or a comma is now expected."
+    }
+
+| l=LPAREN; e=expr; c=COMMA / _* . expr _*
+    {
+      lparen ($startloc(l), $endloc(l)) ^
+      expr ($startloc(e), $endloc(e)) ^
+      comma ($startloc(c), $endloc(c)) ^
+      "An expression is now expected."
+    }
+
+| l=LPAREN; e1=expr; c=COMMA; e2=[expr / _* . RPAREN]
+    {
+      lparen ($startloc(l), $endloc(l)) ^
+      expr ($startloc(e1), $endloc(e1)) ^
+      comma ($startloc(c), $endloc(c)) ^
+      expr ($startloc(e2), $endloc(e2)) ^
+      "A closing parenthesis is now expected."
     }
 
 | e=[expr / _* . EOF]
