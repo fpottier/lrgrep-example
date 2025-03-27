@@ -21,7 +21,7 @@ type 'a checkpoint = 'a I.checkpoint
    the lexer. *)
 
 let print_syntax_error (content : string) (triple : triple) (env : _ env) =
-  Errors.content := Some content; (* TODO *)
+  Errors.content := Some content;
   match Errors.error_message env triple with
   | Some msg ->
       (* This syntax error has an explanation. Print it. *)

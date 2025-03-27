@@ -3,6 +3,10 @@
   open Lexing
   open Printf
 
+  (* Concatenation with a newline in the middle. *)
+
+  let (^/^) s1 s2 = s1 ^ "\n" ^ s2
+
   (* This function is analagous to [MenhirLib.LexerUtil.range] but does not
      print the file name or the trailing colon and newline. *)
   let range' (pos1, pos2) =
@@ -13,10 +17,11 @@
       line char1 char2
       (* use [char1 + 1] and [char2 + 1] if *not* using Caml mode *)
 
-  (* This global reference gives us access to the content of the current
-     file. Using global mutable state is not very elegant. An alternative
-     would be to parameterize every semantic action (below) with [content].
-     TODO do this, once lrgrep supports it *)
+  (* This global reference gives us access to the content of the current file.
+     Using global mutable state is not very elegant, but avoids the noise that
+     would be caused by explicit parameter passing. An alternative would be to
+     parameterize every auxiliary function and every semantic action with the
+     content of the file. *)
 
   let content =
     ref None
@@ -39,17 +44,12 @@
     sprintf "%s has been read (%s):\n  %s\n"
       thing (range' w) (slice w)
 
-  let lparen w =
-    read "An opening parenthesis" w
+  (* Names for various things. *)
 
-  let expr w =
-    read "An expression" w
-
-  let binop w =
-    read "A binary operator" w
-
-  let comma w =
-    read "A comma" w
+  let lparen = read "An opening parenthesis"
+  let expr   = read "An expression"
+  let binop  = read "A binary operator"
+  let comma  = read "A comma"
 
 }
 
@@ -75,7 +75,8 @@ rule error_message = parse error (main)
     {
       lparen ($startloc(l), $endloc(l)) ^
       expr ($startloc(e), $endloc(e)) ^
-      "If this expression is complete,\na closing parenthesis or a comma is now expected."
+      "If this expression is complete," ^/^
+      "a closing parenthesis or a comma is now expected."
     }
 
 | l=LPAREN; e=expr; c=COMMA / _* . expr _*
