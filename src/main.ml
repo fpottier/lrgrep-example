@@ -91,7 +91,7 @@ let fail content (last : unit -> triple) (checkpoint : _ checkpoint) (_) =
   match checkpoint with
   | InputNeeded env ->
       let triple = last() in
-      print_positions triple; (* TODO make sure positions are correct *)
+      print_positions triple;
       print_syntax_error content triple env;
       exit 1
   | _ ->
