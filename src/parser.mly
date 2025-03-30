@@ -14,6 +14,8 @@
 %token COMMA
 (* Symbols. *)
 %token ARROW
+(* Keywords. *)
+%token FUN
 (* End of file. *)
 %token EOF
 
@@ -55,9 +57,12 @@ expr:
 | expr DIV expr
 | MINUS expr %prec UMINUS
 | LPAREN expr COMMA expr RPAREN
-| pat ARROW expr
+| FUN pat ARROW expr
     {}
 
 pat:
 | IDENT
+| INT
+| LPAREN pat RPAREN
+| LPAREN pat COMMA pat RPAREN
     {}

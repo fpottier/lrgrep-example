@@ -50,6 +50,7 @@
   let binop  = read "A binary operator"
   let comma  = read "A comma"
   let expr   = read "An expression"
+  let ffun   = read "The keyword `fun`"
   let lparen = read "An opening parenthesis"
   let pat    = read "A pattern"
 
@@ -98,11 +99,47 @@ rule error_message = parse error (main)
       "A closing parenthesis is now expected."
     }
 
-| p=pat; a=ARROW / _* . expr _*
+| f=FUN; p=pat / _* . ARROW _*
     {
+      ffun ($startloc(f), $endloc(f)) ^
+      pat ($startloc(p), $endloc(p)) ^
+      "An arrow symbol is now expected."
+    }
+
+| f=FUN; p=pat; a=ARROW / _* . expr _*
+    {
+      ffun ($startloc(f), $endloc(f)) ^
       pat ($startloc(p), $endloc(p)) ^
       arrow ($startloc(a), $endloc(a)) ^
       "An expression is now expected."
+    }
+
+| / _* . pat _*
+    {
+      "A pattern is now expected."
+    }
+
+| l=LPAREN / _* . pat _*
+    {
+      lparen ($startloc(l), $endloc(l)) ^
+      "A pattern is now expected."
+    }
+
+| l=LPAREN; p=[pat / _* . RPAREN]
+    {
+      lparen ($startloc(l), $endloc(l)) ^
+      pat ($startloc(p), $endloc(p)) ^
+      "If this pattern is complete," ^/^
+      "a closing parenthesis or a comma is now expected."
+    }
+
+| l=LPAREN; p1=pat; c=COMMA; p2=[pat / _* . RPAREN]
+    {
+      lparen ($startloc(l), $endloc(l)) ^
+      pat ($startloc(p1), $endloc(p1)) ^
+      comma ($startloc(c), $endloc(c)) ^
+      pat ($startloc(p2), $endloc(p2)) ^
+      "A closing parenthesis is now expected."
     }
 
 | e=[expr / _* . EOF]
