@@ -99,7 +99,8 @@ rule error_message = parse error (main)
       "A closing parenthesis is now expected."
     }
 
-| f=FUN; p=pat / _* . ARROW _*
+(* TODO lrgrep tells me this branch is useless, but it shouldn't be! see test/bad/test07.in *)
+| f=FUN; p=[pat / _* . ARROW _*]
     {
       ffun ($startloc(f), $endloc(f)) ^
       pat ($startloc(p), $endloc(p)) ^
@@ -114,6 +115,11 @@ rule error_message = parse error (main)
       "An expression is now expected."
     }
 
+(* TODO this clause is apparently reachable
+        but if I add square brackets around it
+        then lrgrep says it is unreachable.
+        I do not understand this: the square brackets
+        should allow it to match MORE situations. *)
 | / _* . pat _*
     {
       "A pattern is now expected."
@@ -146,6 +152,13 @@ rule error_message = parse error (main)
     {
       expr ($startloc(e), $endloc(e)) ^
       "If this expression is complete, the end of the file is now expected."
+    }
+
+(* TODO this clause is a copy of the previous one so it must be unreachable,
+        yet lrgrep says nothing *)
+| e=[expr / _* . EOF]
+    {
+      assert false
     }
 
 | / _* . main
