@@ -46,10 +46,12 @@
 
   (* Names for various things. *)
 
-  let lparen = read "An opening parenthesis"
-  let expr   = read "An expression"
+  let arrow  = read "An arrow symbol"
   let binop  = read "A binary operator"
   let comma  = read "A comma"
+  let expr   = read "An expression"
+  let lparen = read "An opening parenthesis"
+  let pat    = read "A pattern"
 
 }
 
@@ -94,6 +96,13 @@ rule error_message = parse error (main)
       comma ($startloc(c), $endloc(c)) ^
       expr ($startloc(e2), $endloc(e2)) ^
       "A closing parenthesis is now expected."
+    }
+
+| p=pat; a=ARROW / _* . expr _*
+    {
+      pat ($startloc(p), $endloc(p)) ^
+      arrow ($startloc(a), $endloc(a)) ^
+      "An expression is now expected."
     }
 
 | e=[expr / _* . EOF]

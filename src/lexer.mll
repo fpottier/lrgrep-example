@@ -12,6 +12,10 @@ rule token = parse
     { EOF }
 | ['0'-'9']+ as i
     { INT (int_of_string i) }
+| (['a'-'z'] ['a'-'z''0'-'9']*) as x
+    { IDENT x }
+| "->"
+    { ARROW }
 | ','
     { COMMA }
 | '+'

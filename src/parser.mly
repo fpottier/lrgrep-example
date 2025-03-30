@@ -4,12 +4,16 @@
 
 (* Integer literals. *)
 %token <int> INT
+(* Identifiers. *)
+%token <string> IDENT
 (* Arithmetic operators. *)
 %token PLUS MINUS TIMES DIV
 (* Parentheses. *)
 %token LPAREN RPAREN
 (* Punctuation. *)
 %token COMMA
+(* Symbols. *)
+%token ARROW
 (* End of file. *)
 %token EOF
 
@@ -17,6 +21,7 @@
 
 (* Precedence declarations, lowest (first line) to highest (last line). *)
 
+%nonassoc ARROW
 %left PLUS MINUS
 %left TIMES DIV
 %nonassoc UMINUS
@@ -41,6 +46,7 @@ main:
     {}
 
 expr:
+| IDENT
 | INT
 | LPAREN expr RPAREN
 | expr PLUS expr
@@ -49,4 +55,9 @@ expr:
 | expr DIV expr
 | MINUS expr %prec UMINUS
 | LPAREN expr COMMA expr RPAREN
+| pat ARROW expr
+    {}
+
+pat:
+| IDENT
     {}
