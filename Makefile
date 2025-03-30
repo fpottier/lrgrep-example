@@ -10,7 +10,7 @@ clean:
 # whether all syntax error situations are covered.
 
 coverage: all
-	@ lrgrep -coverage src/errors.mlyl -g _build/default/src/parser.cmly
+	@ lrgrep -coverage-fatal src/errors.mlyl -g _build/default/src/parser.cmly
 
 test:
 	@ dune build @test
