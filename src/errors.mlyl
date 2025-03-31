@@ -101,6 +101,7 @@ rule error_message = parse error (main)
 | e=expr; o=MINUS
 | e=expr; o=DIV
 | e=expr; o=TIMES
+| e=expr; o=SEMI
     (* An expression, followed with a binary operator, has been read. *)
     {
       expr $positions(e) ^

@@ -30,6 +30,8 @@ rule token = parse
     { LPAREN }
 | ')'
     { RPAREN }
+| ';'
+    { SEMI }
 | _ as c
     { let startp = Lexing.lexeme_start_p lexbuf
       and endp = Lexing.lexeme_end_p lexbuf in

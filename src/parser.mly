@@ -10,6 +10,8 @@
 %token PLUS MINUS TIMES DIV EQUAL
 (* Parentheses. *)
 %token LPAREN RPAREN
+(* Punctuation. *)
+%token SEMI
 (* Keywords. *)
 %token LET
 (* End of file. *)
@@ -22,6 +24,7 @@
 %left PLUS MINUS
 %left TIMES DIV
 %nonassoc UMINUS
+%right SEMI
 
 (* -------------------------------------------------------------------------- *)
 
@@ -54,5 +57,6 @@ expr:
 | expr TIMES expr
 | expr DIV expr
 | MINUS expr %prec UMINUS
+| expr SEMI expr
 | LPAREN expr RPAREN
     {}
