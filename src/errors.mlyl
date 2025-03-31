@@ -46,13 +46,9 @@
 
   (* Names for various things. *)
 
-  let arrow  = read "An arrow symbol"
   let binop  = read "A binary operator"
-  let comma  = read "A comma"
   let expr   = read "An expression"
-  let ffun   = read "The keyword `fun`"
   let lparen = read "An opening parenthesis"
-  let pat    = read "A pattern"
 
 }
 
@@ -79,86 +75,13 @@ rule error_message = parse error (main)
       lparen $positions(l) ^
       expr $positions(e) ^
       "If this expression is complete," ^/^
-      "a closing parenthesis or a comma is now expected."
-    }
-
-| l=LPAREN; e=expr; c=COMMA / _* . expr _*
-    {
-      lparen $positions(l) ^
-      expr $positions(e) ^
-      comma $positions(c) ^
-      "An expression is now expected."
-    }
-
-| l=LPAREN; e1=expr; c=COMMA; e2=[expr / _* . RPAREN]
-    {
-      lparen $positions(l) ^
-      expr $positions(e1) ^
-      comma $positions(c) ^
-      expr $positions(e2) ^
-      "A closing parenthesis is now expected."
-    }
-
-(* TODO lrgrep tells me this branch is useless, but it shouldn't be! see test/bad/test07.in *)
-| f=FUN; p=[pat / _* . ARROW _*]
-    {
-      ffun $positions(f) ^
-      pat $positions(p) ^
-      "An arrow symbol is now expected."
-    }
-
-| f=FUN; p=pat; a=ARROW / _* . expr _*
-    {
-      ffun $positions(f) ^
-      pat $positions(p) ^
-      arrow $positions(a) ^
-      "An expression is now expected."
-    }
-
-(* TODO this clause is apparently reachable
-        but if I add square brackets around it
-        then lrgrep says it is unreachable.
-        I do not understand this: the square brackets
-        should allow it to match MORE situations. *)
-| / _* . pat _*
-    {
-      "A pattern is now expected."
-    }
-
-| l=LPAREN / _* . pat _*
-    {
-      lparen $positions(l) ^
-      "A pattern is now expected."
-    }
-
-| l=LPAREN; p=[pat / _* . RPAREN]
-    {
-      lparen $positions(l) ^
-      pat $positions(p) ^
-      "If this pattern is complete," ^/^
-      "a closing parenthesis or a comma is now expected."
-    }
-
-| l=LPAREN; p1=pat; c=COMMA; p2=[pat / _* . RPAREN]
-    {
-      lparen $positions(l) ^
-      pat $positions(p1) ^
-      comma $positions(c) ^
-      pat $positions(p2) ^
-      "A closing parenthesis is now expected."
+      "a closing parenthesis is now expected."
     }
 
 | e=[expr / _* . EOF]
     {
       expr $positions(e) ^
       "If this expression is complete, the end of the file is now expected."
-    }
-
-(* TODO this clause is a copy of the previous one so it must be unreachable,
-        yet lrgrep says nothing *)
-| e=[expr / _* . EOF]
-    {
-      assert false
     }
 
 | / _* . main

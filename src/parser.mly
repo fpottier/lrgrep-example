@@ -10,12 +10,6 @@
 %token PLUS MINUS TIMES DIV
 (* Parentheses. *)
 %token LPAREN RPAREN
-(* Punctuation. *)
-%token COMMA
-(* Symbols. *)
-%token ARROW
-(* Keywords. *)
-%token FUN
 (* End of file. *)
 %token EOF
 
@@ -23,7 +17,6 @@
 
 (* Precedence declarations, lowest (first line) to highest (last line). *)
 
-%nonassoc ARROW
 %left PLUS MINUS
 %left TIMES DIV
 %nonassoc UMINUS
@@ -56,13 +49,4 @@ expr:
 | expr TIMES expr
 | expr DIV expr
 | MINUS expr %prec UMINUS
-| LPAREN expr COMMA expr RPAREN
-| FUN pat ARROW expr
-    {}
-
-pat:
-| IDENT
-| INT
-| LPAREN pat RPAREN
-| LPAREN pat COMMA pat RPAREN
     {}
