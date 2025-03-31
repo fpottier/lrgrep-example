@@ -8,7 +8,7 @@ test:
 
 # [make promote] re-generates the expected-output files *.exp.
 
-promote: test
+promote:
 	@ dune promote
 
 # [make dune] re-generates the file [dune] so that each file named *.in
