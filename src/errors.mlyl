@@ -63,55 +63,55 @@ rule error_message = parse error (main)
 | e=expr; o=DIV / _* . expr _*
 | e=expr; o=TIMES / _* . expr _*
     {
-      expr ($startloc(e), $endloc(e)) ^
-      binop ($startloc(o), $endloc(o)) ^
+      expr $positions(e) ^
+      binop $positions(o) ^
       "An expression is now expected."
     }
 
 | l=LPAREN / _* . expr _*
     {
-      lparen ($startloc(l), $endloc(l)) ^
+      lparen $positions(l) ^
       "An expression is now expected."
     }
 
 | l=LPAREN; e=[expr / _* . RPAREN]
     {
-      lparen ($startloc(l), $endloc(l)) ^
-      expr ($startloc(e), $endloc(e)) ^
+      lparen $positions(l) ^
+      expr $positions(e) ^
       "If this expression is complete," ^/^
       "a closing parenthesis or a comma is now expected."
     }
 
 | l=LPAREN; e=expr; c=COMMA / _* . expr _*
     {
-      lparen ($startloc(l), $endloc(l)) ^
-      expr ($startloc(e), $endloc(e)) ^
-      comma ($startloc(c), $endloc(c)) ^
+      lparen $positions(l) ^
+      expr $positions(e) ^
+      comma $positions(c) ^
       "An expression is now expected."
     }
 
 | l=LPAREN; e1=expr; c=COMMA; e2=[expr / _* . RPAREN]
     {
-      lparen ($startloc(l), $endloc(l)) ^
-      expr ($startloc(e1), $endloc(e1)) ^
-      comma ($startloc(c), $endloc(c)) ^
-      expr ($startloc(e2), $endloc(e2)) ^
+      lparen $positions(l) ^
+      expr $positions(e1) ^
+      comma $positions(c) ^
+      expr $positions(e2) ^
       "A closing parenthesis is now expected."
     }
 
 (* TODO lrgrep tells me this branch is useless, but it shouldn't be! see test/bad/test07.in *)
 | f=FUN; p=[pat / _* . ARROW _*]
     {
-      ffun ($startloc(f), $endloc(f)) ^
-      pat ($startloc(p), $endloc(p)) ^
+      ffun $positions(f) ^
+      pat $positions(p) ^
       "An arrow symbol is now expected."
     }
 
 | f=FUN; p=pat; a=ARROW / _* . expr _*
     {
-      ffun ($startloc(f), $endloc(f)) ^
-      pat ($startloc(p), $endloc(p)) ^
-      arrow ($startloc(a), $endloc(a)) ^
+      ffun $positions(f) ^
+      pat $positions(p) ^
+      arrow $positions(a) ^
       "An expression is now expected."
     }
 
@@ -127,30 +127,30 @@ rule error_message = parse error (main)
 
 | l=LPAREN / _* . pat _*
     {
-      lparen ($startloc(l), $endloc(l)) ^
+      lparen $positions(l) ^
       "A pattern is now expected."
     }
 
 | l=LPAREN; p=[pat / _* . RPAREN]
     {
-      lparen ($startloc(l), $endloc(l)) ^
-      pat ($startloc(p), $endloc(p)) ^
+      lparen $positions(l) ^
+      pat $positions(p) ^
       "If this pattern is complete," ^/^
       "a closing parenthesis or a comma is now expected."
     }
 
 | l=LPAREN; p1=pat; c=COMMA; p2=[pat / _* . RPAREN]
     {
-      lparen ($startloc(l), $endloc(l)) ^
-      pat ($startloc(p1), $endloc(p1)) ^
-      comma ($startloc(c), $endloc(c)) ^
-      pat ($startloc(p2), $endloc(p2)) ^
+      lparen $positions(l) ^
+      pat $positions(p1) ^
+      comma $positions(c) ^
+      pat $positions(p2) ^
       "A closing parenthesis is now expected."
     }
 
 | e=[expr / _* . EOF]
     {
-      expr ($startloc(e), $endloc(e)) ^
+      expr $positions(e) ^
       "If this expression is complete, the end of the file is now expected."
     }
 
