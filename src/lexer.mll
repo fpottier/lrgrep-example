@@ -10,10 +10,14 @@ rule token = parse
     { Lexing.new_line lexbuf; token lexbuf }
 | eof
     { EOF }
+| "let"
+    { LET }
 | ['0'-'9']+ as i
     { INT (int_of_string i) }
 | (['a'-'z'] ['a'-'z''0'-'9']*) as x
     { IDENT x }
+| '='
+    { EQUAL }
 | '+'
     { PLUS }
 | '-'

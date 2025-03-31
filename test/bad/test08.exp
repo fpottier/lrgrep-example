@@ -1,9 +1,7 @@
-File "test05.in", line 1, characters 8-9:
+File "test08.in", line 1, characters 6-7:
 Syntax error.
 A `let` keyword has been read (line 1, characters 0-3):
   let
 An identifier has been read (line 1, characters 4-5):
   x
-An equals sign has been read (line 1, characters 6-7):
-  =
-An expression is now expected.
+An equals sign `=` is now expected.

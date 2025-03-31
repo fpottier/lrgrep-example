@@ -1,0 +1,5 @@
+File "test07.in", line 2, characters 0-3:
+Syntax error.
+A `let` keyword has been read (line 1, characters 0-3):
+  let
+An identifier is now expected.

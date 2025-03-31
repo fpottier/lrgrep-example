@@ -7,9 +7,11 @@
 (* Identifiers. *)
 %token <string> IDENT
 (* Arithmetic operators. *)
-%token PLUS MINUS TIMES DIV
+%token PLUS MINUS TIMES DIV EQUAL
 (* Parentheses. *)
 %token LPAREN RPAREN
+(* Keywords. *)
+%token LET
 (* End of file. *)
 %token EOF
 
@@ -37,7 +39,11 @@
 (* -------------------------------------------------------------------------- *)
 
 main:
-| expr EOF
+  declaration* EOF
+    {}
+
+declaration:
+  LET IDENT EQUAL expr
     {}
 
 expr:

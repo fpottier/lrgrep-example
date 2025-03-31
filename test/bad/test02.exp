@@ -1,5 +1,5 @@
-File "test02.in", line 1, characters 3-4:
+File "test02.in", line 1, characters 11-12:
 Syntax error.
-An opening parenthesis has been read (line 1, characters 2-3):
+An opening parenthesis has been read (line 1, characters 10-11):
   (
 An expression is now expected.

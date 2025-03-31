@@ -47,17 +47,61 @@
   (* Names for various things. *)
 
   let binop  = read "A binary operator"
+  let decl   = read "A declaration"
+  let equal  = read "An equals sign"
   let expr   = read "An expression"
+  let ident  = read "An identifier"
+  let letk   = read "A `let` keyword"
   let lparen = read "An opening parenthesis"
 
 }
 
 rule error_message = parse error (main)
 
+| / _* . main
+    (* Nothing has been read, and [main] is expected. This means that
+       the file is empty or begins with an unacceptable token. *)
+    {
+      "A declaration is now expected."
+    }
+
+| l=LET
+    (* A [let] keyword has been read. *)
+    {
+      letk $positions(l) ^
+      "An identifier is now expected."
+    }
+
+| l=LET; i=IDENT
+    (* A [let] keyword and an identifier have been read. *)
+    {
+      letk $positions(l) ^
+      ident $positions(i) ^
+      "An equals sign `=` is now expected."
+    }
+
+| l=LET; i=IDENT; e=EQUAL
+    (* A [let] keyword, an identifier, and an equals sign have been read. *)
+    {
+      letk $positions(l) ^
+      ident $positions(i) ^
+      equal $positions(e) ^
+      "An expression is now expected."
+    }
+
+| d=[declaration]
+    (* (Some input that can be reduced to) a declaration has been read. *)
+    {
+      decl $positions(d) ^
+      "If this declaration is complete, then" ^/^
+      "another declaration (or the end of the file) is now expected."
+    }
+
 | e=expr; o=PLUS
 | e=expr; o=MINUS
 | e=expr; o=DIV
 | e=expr; o=TIMES
+    (* An expression, followed with a binary operator, has been read. *)
     {
       expr $positions(e) ^
       binop $positions(o) ^
@@ -65,27 +109,19 @@ rule error_message = parse error (main)
     }
 
 | l=LPAREN / _* . expr _*
+    (* An opening parenthesis has been read, in a context where an expression
+       is now expected. *)
     {
       lparen $positions(l) ^
       "An expression is now expected."
     }
 
 | l=LPAREN; e=[expr]
+    (* An opening parenthesis followed with (some input that can be reduced to)
+       an expression has been read. *)
     {
       lparen $positions(l) ^
       expr $positions(e) ^
       "If this expression is complete," ^/^
       "a closing parenthesis is now expected."
-    }
-
-| e=[expr / _* . EOF]
-    {
-      expr $positions(e) ^
-      "If this expression is complete, the end of the file is now expected."
-    }
-
-| / _* . main
-    (* The file is empty or begins with an unacceptable token. *)
-    {
-      "An expression is now expected."
     }
