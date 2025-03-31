@@ -54,6 +54,12 @@
   let letk   = read "A `let` keyword"
   let lparen = read "An opening parenthesis"
 
+  (* This higher-order function is useful when the beginning of a thing
+     has been recognized. *)
+
+  let beginning thing w =
+    "The beginning of " ^ String.lowercase_ascii (thing w)
+
 }
 
 rule error_message = parse error (main)
@@ -68,24 +74,21 @@ rule error_message = parse error (main)
 | l=LET
     (* A [let] keyword has been read. *)
     {
-      letk $positions(l) ^
+      beginning decl $positions(l) ^
       "An identifier is now expected."
     }
 
 | l=LET; i=IDENT
     (* A [let] keyword and an identifier have been read. *)
     {
-      letk $positions(l) ^
-      ident $positions(i) ^
+      beginning decl ($startpos(l), $endpos(i)) ^
       "An equals sign `=` is now expected."
     }
 
-| l=LET; i=IDENT; e=EQUAL
+| l=LET; IDENT; e=EQUAL
     (* A [let] keyword, an identifier, and an equals sign have been read. *)
     {
-      letk $positions(l) ^
-      ident $positions(i) ^
-      equal $positions(e) ^
+      beginning decl ($startpos(l), $endpos(e)) ^
       "An expression is now expected."
     }
 
