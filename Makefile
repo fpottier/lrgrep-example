@@ -17,7 +17,7 @@ test:
 
 # [make promote] creates or updates the expected-output files test/{good,bad}/*.exp.
 
-promote: test
+promote:
 	@ dune promote
 
 # [make conflicts] creates the files src/parser.{conflicts,automaton}.
