@@ -54,10 +54,10 @@
 
 rule error_message = parse error (main)
 
-| e=expr; o=PLUS / _* . expr _*
-| e=expr; o=MINUS / _* . expr _*
-| e=expr; o=DIV / _* . expr _*
-| e=expr; o=TIMES / _* . expr _*
+| e=expr; o=PLUS
+| e=expr; o=MINUS
+| e=expr; o=DIV
+| e=expr; o=TIMES
     {
       expr $positions(e) ^
       binop $positions(o) ^
@@ -70,7 +70,7 @@ rule error_message = parse error (main)
       "An expression is now expected."
     }
 
-| l=LPAREN; e=[expr / _* . RPAREN]
+| l=LPAREN; e=[expr]
     {
       lparen $positions(l) ^
       expr $positions(e) ^
