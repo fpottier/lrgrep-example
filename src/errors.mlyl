@@ -107,6 +107,9 @@ rule error_message = parse error (main)
 | e=expr; o=SEMI
     (* An expression, followed with a binary operator, has been read. *)
     {
+      (* We could say that [e] and [o] together form the beginning of a
+         binary-operator-application expression, but that would perhaps be
+         less clear. *)
       expr $positions(e) ^
       binop $positions(o) ^
       "An expression is now expected."
@@ -124,6 +127,8 @@ rule error_message = parse error (main)
     (* An opening parenthesis followed with (some input that can be reduced to)
        an expression has been read. *)
     {
+      (* We could say that [l] and [e] together form the beginning of a
+         parenthesized expression, but that would perhaps be less clear. *)
       lparen $positions(l) ^
       expr $positions(e) ^
       "If this expression is complete," ^/^
