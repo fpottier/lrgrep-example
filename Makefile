@@ -1,4 +1,4 @@
-.PHONY: all clean coverage test promote
+.PHONY: all clean cov test promote
 
 all:
 	@ dune build src/main.exe
@@ -6,10 +6,10 @@ all:
 clean:
 	@ git clean -fdX
 
-# [make coverage] tests whether errors.mlyl has complete coverage, that is,
+# [make cov] tests whether errors.mlyl has complete coverage, that is,
 # whether all syntax error situations are covered.
 
-coverage: all
+cov: all
 	@ lrgrep -coverage-fatal src/errors.mlyl -g _build/default/src/parser.cmly
 
 test:
