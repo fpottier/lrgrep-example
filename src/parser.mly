@@ -43,10 +43,10 @@ main:
 expr:
 | IDENT
 | INT
-| LPAREN expr RPAREN
 | expr PLUS expr
 | expr MINUS expr
 | expr TIMES expr
 | expr DIV expr
 | MINUS expr %prec UMINUS
+| LPAREN expr RPAREN
     {}
