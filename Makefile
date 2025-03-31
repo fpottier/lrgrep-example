@@ -1,7 +1,7 @@
 .PHONY: all clean coverage test promote
 
 all:
-	@ dune build
+	@ dune build src/main.exe
 
 clean:
 	@ git clean -fdX
