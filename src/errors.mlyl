@@ -12,16 +12,33 @@
 
   let (^/^) s1 s2 = s1 ^ "\n" ^ s2
 
-  (* This function is analagous to [MenhirLib.LexerUtil.range] but does not
-     print the file name or the trailing colon and newline. Also, it prints
-     the line number and character range in a more compact format. *)
-  let range' (pos1, pos2) =
+  (* Recognizing dummy positions. (Which a good lexer should not produce.) *)
+
+  let is_dummy (pos1, pos2) =
+    pos1 == dummy_pos || pos2 == dummy_pos
+
+  (* [range' (pos1, pos2)] renders a line number and character range, based on
+     the start and end positions [pos1] and [pos2], as a string, in a compact
+     format. *)
+
+  let range' ((pos1, pos2) as positions) =
+    if is_dummy positions then "?" else
     let line = pos1.pos_lnum in
     let char1 = pos1.pos_cnum - pos1.pos_bol in
     let char2 = pos2.pos_cnum - pos1.pos_bol in (* yes, [pos1.pos_bol] *)
     sprintf "%d:%d-%d"
       line char1 char2
       (* use [char1 + 1] and [char2 + 1] if *not* using Caml mode *)
+
+  (* [range (pos1, pos2)] renders a file name, line number and character range,
+     based on the start and end positions [pos1] and [pos2], as a string, in a
+     compact format. It is analagous to [MenhirLib.LexerUtil.range] but prints
+     the line number and character range in a more compact format. *)
+
+  let range ((pos1, _) as positions) =
+    if is_dummy positions then "At an unknown location:\n" else
+    let file = pos1.pos_fname in
+    sprintf "File \"%s\" (%s):\n" file (range' positions)
 
   (* This global reference gives us access to the content of the current file.
      Using global mutable state is not very elegant, but avoids the noise that
@@ -125,6 +142,27 @@ rule error_message = parse error (main)
     {
       read (start decl) ($startpos(l), $endpos(e)) ^
       "An expression is now expected."
+    }
+
+| /declaration: . _*; LET; [binding]; s=SEMI; l=LET; b=[binding]
+    (* This clause recognizes a special case of the next clause; so, it could
+       be omitted. *)
+    (* The beginning of a toplevel [let] declaration has been recognized, and
+       in its right-hand side, a semicolon followed with a [let] binding has
+       been read. Because of the semicolon, this second [let] binding has been
+       interpreted as the start of a local declaration. Yet, we have now
+       failed: we expect the keyword [in] and it is not there. Quite likely,
+       the semicolon should be removed; then the second [let] binding would
+       be interpreted as a toplevel declaration. *)
+    (* Possibly, we might wish to compare the indentation levels of the two
+       [let] keywords to help decide whether the suggestion of removing the
+       semicolon seems good. *)
+    {
+      read ldecl ($startpos(l), $endpos(b)) ^
+      "The keyword `in` is now expected." ^/^
+      sprintf "Suggestion: deleting the semicolon that precedes this declaration (%s)"
+        (range' $positions(s)) ^/^
+      "would allow it to be interpreted as a global declaration."
     }
 
 | /expr: . _*; l=LET; b=[binding]

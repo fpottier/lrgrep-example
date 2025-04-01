@@ -1,4 +1,4 @@
-File "test04.in", line 1, characters 11-12:
+File "test04.in" (1:11-12):
 Syntax error.
 A declaration has been read (1:0-11):
   let x = 1+2

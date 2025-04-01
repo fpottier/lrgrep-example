@@ -1,4 +1,4 @@
-File "test10.in", line 2, characters 15-17:
+File "test10.in" (2:15-17):
 Syntax error.
 An expression and a binary operator have been read (2:10-14):
   1+2-
