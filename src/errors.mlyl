@@ -1,19 +1,25 @@
+(* -------------------------------------------------------------------------- *)
+
+(* Auxiliary functions, for use in the semantic actions. *)
+
 {
 
   open Lexing
   open Printf
+  let lowercase = String.lowercase_ascii
 
   (* Concatenation with a newline in the middle. *)
 
   let (^/^) s1 s2 = s1 ^ "\n" ^ s2
 
   (* This function is analagous to [MenhirLib.LexerUtil.range] but does not
-     print the file name or the trailing colon and newline. *)
+     print the file name or the trailing colon and newline. Also, it prints
+     the line number and character range in a more compact format. *)
   let range' (pos1, pos2) =
     let line = pos1.pos_lnum in
     let char1 = pos1.pos_cnum - pos1.pos_bol in
     let char2 = pos2.pos_cnum - pos1.pos_bol in (* yes, [pos1.pos_bol] *)
-    sprintf "line %d, characters %d-%d"
+    sprintf "%d:%d-%d"
       line char1 char2
       (* use [char1 + 1] and [char2 + 1] if *not* using Caml mode *)
 
@@ -37,31 +43,59 @@
     |> compress
     |> shorten 32
 
-  (* [read thing w] indicates that a "thing" has been read, displays the
-     positions, and displays the corresponding input slice. *)
+  (* Names for various syntactic elements. *)
 
-  let read (thing : string) (w : position * position) =
-    sprintf "%s has been read (%s):\n  %s\n"
-      thing (range' w) (slice w)
+  type thing =
+    | Atom  of string        (* example: "A thing" *)
+    | Conj  of thing * thing
+    | Start of thing
 
-  (* Names for various things. *)
+  let atom s = Atom s
+  let (++) thing1 thing2 = Conj (thing1, thing2)
+  let start thing = Start thing
 
-  let binop  = read "A binary operator"
-  let decl   = read "A declaration"
-  let equal  = read "An equals sign"
-  let expr   = read "An expression"
-  let ident  = read "An identifier"
-  let letk   = read "A `let` keyword"
-  let ldecl  = read "A local declaration"
-  let lparen = read "An opening parenthesis"
+  let rec show thing : string =
+    match thing with
+    | Atom s ->
+        s
+    | Conj (thing1, thing2) ->
+        show thing1 ^ " and " ^ lowercase (show thing2)
+    | Start thing ->
+        "The start of " ^ lowercase (show thing)
 
-  (* This higher-order function is useful when the beginning of a thing
-     has been recognized. *)
+  let rec number thing : int =
+    match thing with
+    | Atom _ ->
+        1
+    | Conj (thing1, thing2) ->
+        number thing1 + number thing2
+    | Start thing ->
+        assert (number thing = 1);
+        1
 
-  let beginning thing w =
-    "The beginning of " ^ String.lowercase_ascii (thing w)
+  let binop  = atom "A binary operator"
+  let decl   = atom "A declaration"
+  let equal  = atom "An equals sign"
+  let expr   = atom "An expression"
+  let ident  = atom "An identifier"
+  let letk   = atom "A `let` keyword"
+  let ldecl  = atom "A local declaration"
+  let lparen = atom "An opening parenthesis"
+
+  (* [read thing w] indicates that a thing has been read, displays the
+     positions [w], and displays the corresponding input slice. *)
+
+  let read (thing : thing) (w : position * position) =
+    sprintf "%s %s been read (%s):\n  %s\n"
+      (show thing)
+      (if number thing > 1 then "have" else "has")
+      (range' w) (slice w)
 
 }
+
+(* -------------------------------------------------------------------------- *)
+
+(* A mapping of syntax error situations to syntax error messages. *)
 
 rule error_message = parse error (main)
 
@@ -75,21 +109,21 @@ rule error_message = parse error (main)
 | l=LET
     (* A [let] keyword has been read. *)
     {
-      beginning decl $positions(l) ^
+      read (start decl) $positions(l) ^
       "An identifier is now expected."
     }
 
 | l=LET; i=IDENT
     (* A [let] keyword and an identifier have been read. *)
     {
-      beginning decl ($startpos(l), $endpos(i)) ^
+      read (start decl) ($startpos(l), $endpos(i)) ^
       "An equals sign `=` is now expected."
     }
 
 | l=LET; IDENT; e=EQUAL
     (* A [let] keyword, an identifier, and an equals sign have been read. *)
     {
-      beginning decl ($startpos(l), $endpos(e)) ^
+      read (start decl) ($startpos(l), $endpos(e)) ^
       "An expression is now expected."
     }
 
@@ -100,14 +134,14 @@ rule error_message = parse error (main)
        covered by the next clause, because [LET binding] can then be reduced
        to [declaration].) *)
     {
-      ldecl ($startpos(l), $endpos(b)) ^
+      read ldecl ($startpos(l), $endpos(b)) ^
       "The keyword `in` is now expected."
     }
 
 | d=[declaration]
     (* (Some input that can be reduced to) a declaration has been read. *)
     {
-      decl $positions(d) ^
+      read decl $positions(d) ^
       "If this declaration is complete, then" ^/^
       "another declaration (or the end of the file) is now expected."
     }
@@ -119,11 +153,7 @@ rule error_message = parse error (main)
 | e=expr; o=SEMI
     (* An expression, followed with a binary operator, has been read. *)
     {
-      (* We could say that [e] and [o] together form the beginning of a
-         binary-operator-application expression, but that would perhaps be
-         less clear. *)
-      expr $positions(e) ^
-      binop $positions(o) ^
+      read (expr ++ binop) ($startpos(e), $endpos(o)) ^
       "An expression is now expected."
     }
 
@@ -131,7 +161,7 @@ rule error_message = parse error (main)
     (* An opening parenthesis has been read, in a context where an expression
        is now expected. *)
     {
-      lparen $positions(l) ^
+      read lparen $positions(l) ^
       "An expression is now expected."
     }
 
@@ -139,10 +169,7 @@ rule error_message = parse error (main)
     (* An opening parenthesis followed with (some input that can be reduced to)
        an expression has been read. *)
     {
-      (* We could say that [l] and [e] together form the beginning of a
-         parenthesized expression, but that would perhaps be less clear. *)
-      lparen $positions(l) ^
-      expr $positions(e) ^
+      read (lparen ++ expr) ($startpos(l), $endpos(e)) ^
       "If this expression is complete," ^/^
       "a closing parenthesis is now expected."
     }

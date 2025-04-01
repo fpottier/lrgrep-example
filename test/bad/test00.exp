@@ -1,7 +1,5 @@
 File "test00.in", line 1, characters 13-14:
 Syntax error.
-An expression has been read (line 1, characters 9-12):
-  1+2
-A binary operator has been read (line 1, characters 12-13):
-  -
+An expression and a binary operator have been read (1:9-13):
+  1+2-
 An expression is now expected.

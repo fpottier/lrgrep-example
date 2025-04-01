@@ -1,5 +1,5 @@
 File "test05.in", line 1, characters 8-9:
 Syntax error.
-The beginning of a declaration has been read (line 1, characters 0-7):
+The start of a declaration has been read (1:0-7):
   let x =
 An expression is now expected.
