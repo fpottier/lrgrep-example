@@ -144,7 +144,7 @@ rule error_message = parse error (main)
       "An expression is now expected."
     }
 
-| /declaration: . _*; LET; [binding]; s=SEMI; l=LET; b=[binding]
+| /declaration: . _*; LET; binding; s=SEMI; l=LET; b=[binding]
     (* This clause recognizes a special case of the next clause; so, it could
        be omitted. *)
     (* The beginning of a toplevel [let] declaration has been recognized, and
