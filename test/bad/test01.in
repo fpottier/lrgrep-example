@@ -1,2 +1,4 @@
 let x = 1+2-
 let y = 0
+(* The trailing minus sign on line 1 causes the next line to be
+   mistakenly read as a local declaration. *)

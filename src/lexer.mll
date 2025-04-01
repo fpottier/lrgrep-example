@@ -14,6 +14,8 @@ rule token = parse
     { EOF }
 | "let"
     { LET }
+| "in"
+    { IN }
 | ['0'-'9']+ as i
     { INT (int_of_string i) }
 | (['a'-'z'] ['a'-'z''0'-'9']*) as x

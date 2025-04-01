@@ -1,0 +1,4 @@
+let a =
+  let x = 1+2- in
+  0
+(* The extraneous minus sign on line 2 is a problem. *)

@@ -13,7 +13,7 @@
 (* Punctuation. *)
 %token SEMI
 (* Keywords. *)
-%token LET
+%token LET IN
 (* End of file. *)
 %token EOF
 
@@ -25,6 +25,7 @@
 %left TIMES DIV
 %nonassoc UMINUS
 %right SEMI
+%nonassoc IN
 
 (* -------------------------------------------------------------------------- *)
 
@@ -46,7 +47,11 @@ main:
     {}
 
 declaration:
-  LET IDENT EQUAL expr
+  LET binding
+    {}
+
+binding:
+  IDENT EQUAL expr
     {}
 
 expr:
@@ -59,4 +64,5 @@ expr:
 | MINUS expr %prec UMINUS
 | expr SEMI expr
 | LPAREN expr RPAREN
+| LET binding IN expr
     {}
