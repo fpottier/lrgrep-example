@@ -19,3 +19,10 @@
 
 (rule (alias test) (action (diff test02.exp test02.out)))
 
+(rule (target test03.out) (deps test03.in)
+  (action
+    (with-outputs-to test03.out
+      (with-accepted-exit-codes 0 (run ../../src/main.exe %{deps})))))
+
+(rule (alias test) (action (diff test03.exp test03.out)))
+
