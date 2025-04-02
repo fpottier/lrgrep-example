@@ -144,16 +144,22 @@ rule error_message = parse error (main)
       "An expression is now expected."
     }
 
-| /declaration: . _*; LET; [binding]; s=SEMI; l=LET; b=[binding]
-    (* This clause recognizes a special case of the next clause; so, it could
-       be omitted. *)
-    (* The beginning of a toplevel [let] declaration has been recognized, and
-       in its right-hand side, a semicolon followed with a [let] binding has
-       been read. Because of the semicolon, this second [let] binding has been
-       interpreted as the start of a local declaration. Yet, we have now
-       failed: we expect the keyword [in] and it is not there. Quite likely,
-       the semicolon should be removed; then the second [let] binding would
-       be interpreted as a toplevel declaration. *)
+| [declaration]; s=SEMI; l=LET; b=[binding]
+    (* Because [LET binding] can be reduced to [declaration], this clause
+       is a special case of the next clause; so, it could be omitted. *)
+    (* Something that could form a toplevel declaration, such as [let x = y],
+       has been read, and following this, a semicolon and a [let] binding have
+       been read, say, [let z = 0]. Because of the semicolon, this binding has
+       been interpreted as the start of a local declaration, as if the
+       sequence [y; let z = 0 ...] was logically nested inside the toplevel
+       declaration [let x = ...]. Yet, at this point, the parser has failed:
+       the keyword [in] is expected and it is not there. *)
+    (* One could, if desired, add the item:
+         /expr: LET binding . IN expr
+       inside the second pair of square brackets above. *)
+     (* Quite likely, the semicolon should be removed; then the second [let]
+        binding would be interpreted as a toplevel declaration. We make this
+        suggestion. *)
     {
       read ldecl ($startpos(l), $endpos(b)) ^
       "The keyword `in` is now expected." ^/^
