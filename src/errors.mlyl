@@ -116,7 +116,7 @@
 
 rule error_message = parse error (main)
 
-| / _* . main
+| / . main
     (* Nothing has been read, and `main` is expected. This means that
        the file is empty or begins with an unacceptable token. *)
     {
