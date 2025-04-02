@@ -154,9 +154,6 @@ rule error_message = parse error (main)
        failed: we expect the keyword [in] and it is not there. Quite likely,
        the semicolon should be removed; then the second [let] binding would
        be interpreted as a toplevel declaration. *)
-    (* Possibly, we might wish to compare the indentation levels of the two
-       [let] keywords to help decide whether the suggestion of removing the
-       semicolon seems good. *)
     {
       read ldecl ($startpos(l), $endpos(b)) ^
       "The keyword `in` is now expected." ^/^
