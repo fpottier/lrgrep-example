@@ -21,11 +21,11 @@
 
 (* Precedence declarations, lowest (first line) to highest (last line). *)
 
-%left PLUS MINUS
-%left TIMES DIV
-%nonassoc UMINUS
-%right SEMI
 %nonassoc IN
+%right SEMI           (* let x = 0 in f(); y *)
+%left PLUS MINUS      (* f(); y+1            *)
+%left TIMES DIV       (* 1 + 2*3             *)
+%nonassoc UMINUS      (* -x * 2              *)
 
 (* -------------------------------------------------------------------------- *)
 
