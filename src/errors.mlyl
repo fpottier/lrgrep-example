@@ -165,23 +165,26 @@ rule error_message = parse error (main)
       "would allow it to be interpreted as a global declaration."
     }
 
-| /expr: . _*; l=LET; b=[binding]
-    (* A [let] keyword, an identifier, an equals sign, and an expression have
-       been read. Furthermore, we are in a context where a local declaration
-       is expected. (The situation where a toplevel declaration is expected is
-       covered by the next clause, because [LET binding] can then be reduced
-       to [declaration].) *)
-    {
-      read ldecl ($startpos(l), $endpos(b)) ^
-      "The keyword `in` is now expected."
-    }
-
 | d=[declaration]
     (* (Some input that can be reduced to) a declaration has been read. *)
     {
       read decl $positions(d) ^
       "If this declaration is complete, then" ^/^
       "another declaration (or the end of the file) is now expected."
+    }
+
+| l=LET; b=[binding]
+    (* A [let] keyword, an identifier, an equals sign, and an expression have
+       been read. Furthermore, we are in a context where a local declaration
+       is expected. (The situation where a toplevel declaration is expected is
+       covered by the previous clause, because [LET binding] can then be reduced
+       to [declaration].) *)
+    (* One could, if desired, add the item:
+         /expr: LET binding . IN expr
+       inside the square brackets above. *)
+    {
+      read ldecl ($startpos(l), $endpos(b)) ^
+      "The keyword `in` is now expected."
     }
 
 | e=expr; o=PLUS
