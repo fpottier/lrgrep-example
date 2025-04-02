@@ -117,47 +117,47 @@
 rule error_message = parse error (main)
 
 | / _* . main
-    (* Nothing has been read, and [main] is expected. This means that
+    (* Nothing has been read, and `main` is expected. This means that
        the file is empty or begins with an unacceptable token. *)
     {
       "A declaration is now expected."
     }
 
 | l=LET
-    (* A [let] keyword has been read. *)
+    (* A `let` keyword has been read. *)
     {
       read (start decl) $positions(l) ^
       "An identifier is now expected."
     }
 
 | l=LET; i=IDENT
-    (* A [let] keyword and an identifier have been read. *)
+    (* A `let` keyword and an identifier have been read. *)
     {
       read (start decl) ($startpos(l), $endpos(i)) ^
       "An equals sign `=` is now expected."
     }
 
 | l=LET; IDENT; e=EQUAL
-    (* A [let] keyword, an identifier, and an equals sign have been read. *)
+    (* A `let` keyword, an identifier, and an equals sign have been read. *)
     {
       read (start decl) ($startpos(l), $endpos(e)) ^
       "An expression is now expected."
     }
 
 | [declaration]; s=SEMI; l=LET; b=[binding]
-    (* Because [LET binding] can be reduced to [declaration], this clause
+    (* Because `LET binding` can be reduced to `declaration`, this clause
        is a special case of the next clause; so, it could be omitted. *)
-    (* Something that could form a toplevel declaration, such as [let x = y],
-       has been read, and following this, a semicolon and a [let] binding have
-       been read, say, [let z = 0]. Because of the semicolon, this binding has
+    (* Something that could form a toplevel declaration, such as `let x = y`,
+       has been read, and following this, a semicolon and a `let` binding have
+       been read, say, `let z = 0`. Because of the semicolon, this binding has
        been interpreted as the start of a local declaration, as if the
-       sequence [y; let z = 0 ...] was logically nested inside the toplevel
-       declaration [let x = ...]. Yet, at this point, the parser has failed:
-       the keyword [in] is expected and it is not there. *)
+       sequence `y; let z = 0 ...` was logically nested inside the toplevel
+       declaration `let x = ...`. Yet, at this point, the parser has failed:
+       the keyword `in` is expected and it is not there. *)
     (* One could, if desired, add the item:
          /expr: LET binding . IN expr
        inside the second pair of square brackets above. *)
-     (* Quite likely, the semicolon should be removed; then the second [let]
+     (* Quite likely, the semicolon should be removed; then the second `let`
         binding would be interpreted as a toplevel declaration. We make this
         suggestion. *)
     {
@@ -177,11 +177,11 @@ rule error_message = parse error (main)
     }
 
 | l=LET; b=[binding]
-    (* A [let] keyword, an identifier, an equals sign, and an expression have
+    (* A `let` keyword, an identifier, an equals sign, and an expression have
        been read. Furthermore, we are in a context where a local declaration
        is expected. (The situation where a toplevel declaration is expected is
-       covered by the previous clause, because [LET binding] can then be reduced
-       to [declaration].) *)
+       covered by the previous clause, because `LET binding` can then be reduced
+       to `declaration`.) *)
     (* One could, if desired, add the item:
          /expr: LET binding . IN expr
        inside the square brackets above. *)
