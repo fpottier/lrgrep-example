@@ -137,6 +137,14 @@ rule error_message = parse error (main)
       "An equals sign `=` is now expected."
     }
 
+(* BUG: this clause makes three clauses (below) unreachable, as shown by `make
+        test`. These are the clauses that print "An expression is now expected".
+        Yet lrgrep says just: `148.2: warning: clause is unreachable`. *)
+| / _* . expr _*
+    {
+      "An expression is now expected."
+    }
+
 | l=LET; IDENT; e=EQUAL
     (* A `let` keyword, an identifier, and an equals sign have been read. *)
     {
