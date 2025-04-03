@@ -144,9 +144,18 @@ rule error_message = parse error (main)
       "An expression is now expected."
     }
 
+| d=[declaration]
+    (* (Some input that can be reduced to) a declaration has been read. *)
+    {
+      read decl $positions(d) ^
+      "If this declaration is complete, then" ^/^
+      "another declaration (or the end of the file) is now expected."
+    }
+
 | [declaration]; s=SEMI; l=LET; b=[binding]
-    (* Because `LET binding` can be reduced to `declaration`, this clause
-       is a special case of the next clause; so, it could be omitted. *)
+    (* This clause is a special case of the next clause, where we recognize a
+       larger context, and are able to print an extra suggestion. If desired,
+       it could be removed. *)
     (* Something that could form a toplevel declaration, such as `let x = y`,
        has been read, and following this, a semicolon and a `let` binding have
        been read, say, `let z = 0`. Because of the semicolon, this binding has
@@ -166,14 +175,6 @@ rule error_message = parse error (main)
       sprintf "Suggestion: deleting the semicolon that precedes this declaration (%s)"
         (range' $positions(s)) ^/^
       "would allow it to be interpreted as a global declaration."
-    }
-
-| d=[declaration]
-    (* (Some input that can be reduced to) a declaration has been read. *)
-    {
-      read decl $positions(d) ^
-      "If this declaration is complete, then" ^/^
-      "another declaration (or the end of the file) is now expected."
     }
 
 | l=LET; b=[binding]
