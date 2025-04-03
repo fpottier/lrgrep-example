@@ -20,8 +20,11 @@ test:
 promote:
 	@ dune promote
 
-# [make conflicts] creates the files src/parser.{conflicts,automaton}.
+# [make data] creates the files src/parser.{conflicts,automaton,pdf}.
 
-.PHONY: conflicts
-conflicts: all
-	@ menhir --infer --explain --dump src/parser.mly && rm -f src/parser.{ml,mli}
+.PHONY: data
+data: all
+	@ menhir --infer --explain --dump --automaton-graph src/parser.mly
+	@ rm -f src/parser.{ml,mli}
+	@ dot -Tpdf src/parser.dot > src/parser.pdf
+	@ rm -f src/parser.dot
