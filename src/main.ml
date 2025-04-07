@@ -39,7 +39,7 @@ let print_syntax_error (content : string) (triple : triple) (env : _ env) =
 
 let print_positions triple =
   let (_, startp, endp) = triple in
-  eprintf "%s" (MenhirLib.LexerUtil.range (startp, endp))
+  eprintf "%s" (Errors.range (startp, endp))
 
 (* -------------------------------------------------------------------------- *)
 

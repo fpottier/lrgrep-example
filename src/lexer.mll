@@ -12,10 +12,16 @@ rule token = parse
     { Lexing.new_line lexbuf; token lexbuf }
 | eof
     { EOF }
+| "let"
+    { LET }
+| "in"
+    { IN }
 | ['0'-'9']+ as i
     { INT (int_of_string i) }
-| ','
-    { COMMA }
+| (['a'-'z'] ['a'-'z''0'-'9']*) as x
+    { IDENT x }
+| '='
+    { EQUAL }
 | '+'
     { PLUS }
 | '-'
@@ -28,6 +34,8 @@ rule token = parse
     { LPAREN }
 | ')'
     { RPAREN }
+| ';'
+    { SEMI }
 | _ as c
     { let startp = Lexing.lexeme_start_p lexbuf
       and endp = Lexing.lexeme_end_p lexbuf in

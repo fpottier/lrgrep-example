@@ -4,12 +4,16 @@
 
 (* Integer literals. *)
 %token <int> INT
+(* Identifiers. *)
+%token <string> IDENT
 (* Arithmetic operators. *)
-%token PLUS MINUS TIMES DIV
+%token PLUS MINUS TIMES DIV EQUAL
 (* Parentheses. *)
 %token LPAREN RPAREN
 (* Punctuation. *)
-%token COMMA
+%token SEMI
+(* Keywords. *)
+%token LET IN
 (* End of file. *)
 %token EOF
 
@@ -17,9 +21,11 @@
 
 (* Precedence declarations, lowest (first line) to highest (last line). *)
 
-%left PLUS MINUS
-%left TIMES DIV
-%nonassoc UMINUS
+%nonassoc IN
+%right SEMI           (* let x = 0 in f(); y *)
+%left PLUS MINUS      (* f(); y+1            *)
+%left TIMES DIV       (* 1 + 2*3             *)
+%nonassoc UMINUS      (* -x * 2              *)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -37,16 +43,26 @@
 (* -------------------------------------------------------------------------- *)
 
 main:
-| expr EOF
+  declaration* EOF
+    {}
+
+declaration:
+  LET binding
+    {}
+
+binding:
+  IDENT EQUAL expr
     {}
 
 expr:
+| IDENT
 | INT
-| LPAREN expr RPAREN
 | expr PLUS expr
 | expr MINUS expr
 | expr TIMES expr
 | expr DIV expr
 | MINUS expr %prec UMINUS
-| LPAREN expr COMMA expr RPAREN
+| expr SEMI expr
+| LPAREN expr RPAREN
+| LET binding IN expr
     {}
