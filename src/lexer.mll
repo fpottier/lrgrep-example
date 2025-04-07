@@ -4,6 +4,8 @@
 }
 
 rule token = parse
+| "(*"
+    { comment lexbuf }
 | [' ' '\t']
     { token lexbuf }
 | ['\n']
@@ -31,3 +33,9 @@ rule token = parse
       and endp = Lexing.lexeme_end_p lexbuf in
       let message = Printf.sprintf "Lexical error: unexpected character: '%c'." c in
       raise (Error (message, startp, endp)) }
+
+and comment = parse
+| "*)"
+    { token lexbuf }
+| _
+    { comment lexbuf }
