@@ -25,7 +25,6 @@
 %right SEMI           (* let x = 0 in f(); y *)
 %left PLUS MINUS      (* f(); y+1            *)
 %left TIMES DIV       (* 1 + 2*3             *)
-%nonassoc UMINUS      (* -x * 2              *)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -61,7 +60,7 @@ expr:
 | expr MINUS expr
 | expr TIMES expr
 | expr DIV expr
-| MINUS expr %prec UMINUS
+| MINUS expr
 | expr SEMI expr
 | LPAREN expr RPAREN
 | LET binding IN expr
