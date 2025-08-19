@@ -105,7 +105,7 @@ let process (filename : string) =
   (* Read the file's entire content and create a lexing buffer. *)
   let content, lexbuf = MenhirLib.LexerUtil.read filename in
   (* Create an initial checkpoint for the parser. *)
-  let start = Parser.Incremental.main (lexeme_start_p lexbuf) in
+  let start = Parser.Incremental.file (lexeme_start_p lexbuf) in
   (* Package our lexer and lexing buffer as a [next] function. *)
   let (next : unit -> triple) = I.lexer_lexbuf_to_supplier Lexer.token lexbuf in
   (* Remember the last token that was produced. *)

@@ -28,20 +28,20 @@
 
 (* -------------------------------------------------------------------------- *)
 
-(* The entry point is [main]. *)
+(* The entry point is [file]. *)
 
 (* Because this demo focuses on handling and reporting syntax errors, this
    parser does not produce abstract syntax trees; instead, when the input is
    syntactically correct, it returns just a unit value. This removes a lot of
    noise and makes it easier to modify the grammar. *)
 
-%start <unit> main
+%start <unit> file
 
 %%
 
 (* -------------------------------------------------------------------------- *)
 
-main:
+file:
   declaration* EOF
     {}
 

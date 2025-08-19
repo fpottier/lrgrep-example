@@ -114,11 +114,12 @@
 
 (* A mapping of syntax error situations to syntax error messages. *)
 
-rule error_message = parse error (main)
+rule error_message = parse error (file)
 
-| / . main
-    (* Nothing has been read, and `main` is expected. This means that
-       the file is empty or begins with an unacceptable token. *)
+| / . file
+    (* Nothing has been read, and `file` is expected. This means that
+       begins with an unacceptable token. (This token cannot be EOF,
+       which in this state is acceptable.) *)
     {
       "A declaration is now expected."
     }
