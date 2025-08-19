@@ -19,7 +19,7 @@
   (targets errors.ml)
   (deps    parser.cmly errors.mlyl)
   (action
-     (run lrgrep errors.mlyl -g parser.cmly -o errors.ml)))
+     (run lrgrep compile -s errors.mlyl -g parser.cmly -o errors.ml)))
 
 ;; This is the executable file for this demo.
 
