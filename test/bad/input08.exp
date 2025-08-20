@@ -1,4 +1,4 @@
-File "test01.in" (4:0-0):
+File "input08.in" (3:0-0):
 Syntax error.
 A local declaration has been read (2:0-9):
   let y = 0

@@ -47,19 +47,19 @@
 
 (rule (alias test) (action (diff input07.exp input07.out)))
 
+(rule (target input08.out) (deps input08.in)
+  (action
+    (with-outputs-to input08.out
+      (with-accepted-exit-codes 1 (run ../../src/main.exe %{deps})))))
+
+(rule (alias test) (action (diff input08.exp input08.out)))
+
 (rule (target test00.out) (deps test00.in)
   (action
     (with-outputs-to test00.out
       (with-accepted-exit-codes 1 (run ../../src/main.exe %{deps})))))
 
 (rule (alias test) (action (diff test00.exp test00.out)))
-
-(rule (target test01.out) (deps test01.in)
-  (action
-    (with-outputs-to test01.out
-      (with-accepted-exit-codes 1 (run ../../src/main.exe %{deps})))))
-
-(rule (alias test) (action (diff test01.exp test01.out)))
 
 (rule (target test03.out) (deps test03.in)
   (action
