@@ -17,11 +17,11 @@
   let is_dummy (pos1, pos2) =
     pos1 == dummy_pos || pos2 == dummy_pos
 
-  (* [range' (pos1, pos2)] renders a line number and character range, based on
+  (* [range (pos1, pos2)] renders a line number and character range, based on
      the start and end positions [pos1] and [pos2], as a string, in a compact
      format. *)
 
-  let range' ((pos1, pos2) as positions) =
+  let range ((pos1, pos2) as positions) =
     if is_dummy positions then "?" else
     let line = pos1.pos_lnum in
     let char1 = pos1.pos_cnum - pos1.pos_bol in
@@ -30,15 +30,17 @@
       line char1 char2
       (* use [char1 + 1] and [char2 + 1] if *not* using Caml mode *)
 
-  (* [range (pos1, pos2)] renders a file name, line number and character range,
-     based on the start and end positions [pos1] and [pos2], as a string, in a
-     compact format. It is analagous to [MenhirLib.LexerUtil.range] but prints
-     the line number and character range in a more compact format. *)
+  (* [file_name_and_range (pos1, pos2)] renders a file name, line number and
+     character range, based on the start and end positions [pos1] and [pos2],
+     as a string, in a compact format.
 
-  let range ((pos1, _) as positions) =
+     It is analagous to [MenhirLib.LexerUtil.range] but prints the line number
+     and character range in a more compact format. *)
+
+  let file_name_and_range ((pos1, _) as positions) =
     if is_dummy positions then "At an unknown location:\n" else
     let file = pos1.pos_fname in
-    sprintf "File \"%s\" (%s):\n" file (range' positions)
+    sprintf "File \"%s\" (%s):\n" file (range positions)
 
   (* This global reference gives us access to the content of the current file.
      Using global mutable state is not very elegant, but avoids the noise that
@@ -106,7 +108,7 @@
     sprintf "%s %s been read (%s):\n  %s\n"
       (show thing)
       (if number thing > 1 then "have" else "has")
-      (range' w) (slice w)
+      (range w) (slice w)
 
 }
 
@@ -174,7 +176,7 @@ rule error_message = parse error (file)
       read ldecl ($startpos(l), $endpos(b)) ^
       "The keyword `in` is now expected." ^/^
       sprintf "Suggestion: deleting the semicolon that precedes this declaration (%s)"
-        (range' $positions(s)) ^/^
+        (range $positions(s)) ^/^
       "would allow it to be interpreted as a global declaration."
     }
 
